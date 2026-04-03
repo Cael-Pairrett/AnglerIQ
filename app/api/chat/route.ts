@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { answerChat } from "@/server/services/chat";
+import type { ChatContext } from "@/types";
 
 const messageSchema = z.object({
   role: z.enum(["user", "assistant"]),
@@ -19,6 +20,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid chat payload" }, { status: 400 });
   }
 
-  const response = await answerChat(parsed.data);
+  const response = await answerChat(parsed.data as ChatContext);
   return NextResponse.json(response);
 }
