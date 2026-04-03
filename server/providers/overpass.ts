@@ -66,32 +66,38 @@ out center 30;`;
   }
 
   const data = (await response.json()) as OverpassResponse;
+  const amenities: AmenityPoint[] = [];
 
-  return data.elements
-    .map((element) => {
-      const lat = element.lat ?? element.center?.lat;
-      const lon = element.lon ?? element.center?.lon;
-      const tags = element.tags ?? {};
-      const type = mappings.map((entry) => entry.matcher(tags)).find(Boolean);
-      if (!lat || !lon || !type) return null;
+  for (const element of data.elements) {
+    const lat = element.lat ?? element.center?.lat;
+    const lon = element.lon ?? element.center?.lon;
+    const tags = element.tags ?? {};
+    const type = mappings
+      .map((entry) => entry.matcher(tags))
+      .find((value): value is AmenityType => value !== null);
 
-      return {
-        id: String(element.id),
-        name: tags.name ?? tags.operator ?? "Nearby access point",
-        type,
-        latitude: lat,
-        longitude: lon,
-        distanceMiles: milesBetween(latitude, longitude, lat, lon),
-        relevanceNote:
-          type === "boat_ramp"
-            ? "Useful for launch access."
-            : type === "shore_access"
-              ? "Possible bank-fishing access."
-              : "Helpful pre-trip amenity.",
-        source: "osm"
-      } satisfies AmenityPoint;
-    })
-    .filter((item): item is AmenityPoint => Boolean(item))
+    if (!lat || !lon || !type) {
+      continue;
+    }
+
+    amenities.push({
+      id: String(element.id),
+      name: tags.name ?? tags.operator ?? "Nearby access point",
+      type,
+      latitude: lat,
+      longitude: lon,
+      distanceMiles: milesBetween(latitude, longitude, lat, lon),
+      relevanceNote:
+        type === "boat_ramp"
+          ? "Useful for launch access."
+          : type === "shore_access"
+            ? "Possible bank-fishing access."
+            : "Helpful pre-trip amenity.",
+      source: "osm"
+    });
+  }
+
+  return amenities
     .sort((a, b) => (a.distanceMiles ?? 999) - (b.distanceMiles ?? 999))
     .slice(0, 20);
 }

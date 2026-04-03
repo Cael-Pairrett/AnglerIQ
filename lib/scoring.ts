@@ -1,9 +1,11 @@
 import { clamp } from "@/lib/utils";
 import type {
   AreaInsights,
+  ConfidenceLevel,
   FishingOutlook,
   ForecastDay,
   HourlyConditions,
+  TrendDirection,
   WaterConditions
 } from "@/types";
 import type { CurrentConditions } from "@/types";
@@ -141,7 +143,7 @@ export function buildOutlook(params: {
 export function projectForecastOutlooks(
   forecast: ForecastDay[],
   water: WaterConditions
-) {
+): ForecastDay[] {
   return forecast.map((day, index, list) => {
     const score =
       72 -
@@ -153,7 +155,7 @@ export function projectForecastOutlooks(
 
     const rounded = clamp(Math.round(score), 25, 92);
     const previous = list[index - 1];
-    const trend =
+    const trend: TrendDirection =
       !previous
         ? "Stable"
         : rounded > (previous.projectedOutlook?.score ?? rounded) + 3
@@ -161,6 +163,8 @@ export function projectForecastOutlooks(
           : rounded < (previous.projectedOutlook?.score ?? rounded) - 3
             ? "Declining"
             : "Stable";
+    const confidence: ConfidenceLevel =
+      water.status === "confirmed" ? "High" : "Medium";
 
     return {
       ...day,
@@ -168,7 +172,7 @@ export function projectForecastOutlooks(
       projectedOutlook: {
         score: rounded,
         rating: ratingForScore(rounded),
-        confidence: water.status === "confirmed" ? "High" : "Medium",
+        confidence,
         trend,
         reasons: [
           day.windSpeedMph < 12 ? "Wind stays manageable." : "Wind is a limiting factor.",

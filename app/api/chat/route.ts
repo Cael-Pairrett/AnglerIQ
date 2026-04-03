@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { answerChat } from "@/server/services/chat";
-import type { ChatContext } from "@/types";
+import type { ChatContext, LocationIntelligenceBundle } from "@/types";
 
 const messageSchema = z.object({
   role: z.enum(["user", "assistant"]),
@@ -20,6 +20,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid chat payload" }, { status: 400 });
   }
 
-  const response = await answerChat(parsed.data as ChatContext);
+  const context: ChatContext = {
+    bundle: parsed.data.bundle as LocationIntelligenceBundle,
+    messages: parsed.data.messages
+  };
+
+  const response = await answerChat(context);
   return NextResponse.json(response);
 }
