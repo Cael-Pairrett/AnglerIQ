@@ -1,5 +1,9 @@
 # AnglerIQ
 
+[![Live demo](https://img.shields.io/badge/demo-live-brightgreen?logo=vercel)](https://angler-iq.vercel.app)
+
+Live demo: https://angler-iq.vercel.app
+
 AnglerIQ is a modern freshwater fishing intelligence web app built with Next.js, TypeScript, Tailwind CSS, Leaflet, and Recharts. It helps anglers decide whether a specific location is worth fishing right now or in the coming days by combining weather, forecast, available water conditions, public access information, local amenities, and a built-in assistant.
 
 ## Features
@@ -62,7 +66,7 @@ Notes:
 - Leave `OPENAI_API_KEY` empty to use the deterministic in-app fallback assistant.
 - Set `NEXT_PUBLIC_ENABLE_LIVE_DATA=false` to force demo mode for local design review or offline development.
 
-## Local Setup
+## Run Locally
 
 1. Install Node.js 20 or newer.
 2. Install dependencies:
@@ -71,13 +75,14 @@ Notes:
 npm install
 ```
 
-3. Start the development server:
+3. (Optional) Copy `.env.example` to `.env.local` and adjust values.
+4. Start the development server:
 
 ```bash
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000).
+5. Open [http://localhost:3000](http://localhost:3000).
 
 ## Run Tests
 
@@ -103,15 +108,3 @@ If provider calls fail, the app falls back to seeded freshwater demo data and la
 - Fishing scoring is deterministic and weighted by weather, wind, pressure, cloud cover, seasonality, and available water data.
 - Favorites and recent spots are intentionally local-only in this first version.
 - LLM integration is optional by design so the app remains functional without paid APIs.
-
-## Known Constraints In This Workspace
-
-This repository was scaffolded in an environment where `node` and `npm` were not installed, so the code could not be executed, linted, or build-tested here. Once Node.js is installed locally, run:
-
-```bash
-npm install
-npm run test
-npm run build
-```
-
-That will be the first runtime verification pass.
